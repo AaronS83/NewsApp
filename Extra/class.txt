@@ -1,0 +1,162 @@
+Class based components
+
+let {title, description,imgUrl, } = this.props; 
+// This is used as a object deconstructor,
+// Javascript has a object deconstructor that deconstructs the object passed but the object should have the same name as the deconstructed thing
+// eg we need to pass title, description and imgUrl only then it will deconstruct properly
+
+Whenever you are calling a constructor, you need to add super() to call the parent constructor
+we can set the state of an object using a constructor.
+
+even though we can set the state individually, its better to avoid it like the function one, we can use this.setState to set the state instead of accessing it directly
+
+We use state when we want to dynamically change the state of the object, and have it change in the users screen without reloading the page.(value of the variable)
+In the current project, we do not want to change the state of the title so therefore we do not need to make the title as a state in newsItem.
+
+** can not change props, it is read only
+
+Iterating through the articles:
+    1) Using the this.state.articles.map() we can iterate through the array
+    2) The map function takes a arrow function and expects you to return something
+    3) We need to have a unique key for each element in the object array that we loop through 
+    4) This has to be a key that can uniquely identify the element that we can refer to
+    5) The key has to be a property of the html tag (eg a div ) that the map function returns
+
+news.js
+        <div className="row my-4">
+        {this.state.articles.map((element)=>{
+          return <div className="col-md-4" key={element.url}>
+              {/* We can use object destructuring to extract the url if we wanted to */}
+              <NewsItem  title = {element.title?element.title.slice(0, 25):""} description = {element.description.slice(0, 90)} imgUrl = {element.urlToImage} newsUrl = {element.url}/>
+            </div>
+        })}
+        </div>
+
+****
+So the above code iterates through the articles array and return a div with className "col-md-4"
+We call the NewsItem in the News.js with the title and the description of one index of the array
+We know that the url of each news will be unique so thats why we use it as a key and also we sent it as newsUrl so that if the user wants to read more about the news
+he can go to that link
+We have restricted the length of the title to 45 characters and the description to 90 characters
+If description is null, and if we slice it, it will throw an error, therefore we have kept a ternary operator to show an empty string if it is null
+**** 
+
+newsItem.js
+                render() {
+                let {title, description,imgUrl,newsUrl } = this.props;
+                return (
+                <div>
+                    <div className="card" style={{width: "18rem"}}>
+                        <img src={imgUrl} className="card-img-top" alt="..."/>
+                        <div className="card-body">
+                            <h5 className="card-title">{title}</h5>
+                            <p className="card-text">{description}</p>
+                            <a href={newsUrl} target="_blank"  className="btn btn-sm btn-primary">Read more</a>
+                        </div>
+                    </div>
+                </div>
+                )
+            }
+
+****
+In the above code, we are first destructuring the props that is sent by the news
+Each newsItem.js gets one title, description, imgUrl and newsUrl
+We know that the url of each news will be unique so thats why we use it as a href to that the user can directly go to that site to read more about the news.
+target="_blank" is used to open a new tab when we click on the button (Read more)
+
+
+_____________________________________________________________________________________________________________________________________________________________
+
+ComponentDidMount() - this is a lifecycle method.
+                    This is ran after the render method is ran
+                    therefore the render runs first then the lifecycle method runs later
+
+componentDidMount () {
+  let url = "https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=615b243665b94ce79beb2e3856e78c23";
+  let data = fetch(url);
+}
+In this version the cdm is ran and the js waits for this to fetch shit before running anything else.
+We wait for the cdm to fetch data and only then it runs the rest of the code
+
+
+async componentDidMount () {
+  let url = "https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=615b243665b94ce79beb2e3856e78c23";
+  let data = await fetch(url);
+}
+
+// In this, we use async version of cdm
+it waits for some of the promise to be resolved before running
+
+_____________________________________________________________________________________________________________________________________________________________
+
+The api has pages and each page has its own set of news that it returns, therefore, we can go to the next page editing the page
+
+_____________________________________________________________________________________________________________________________________________________________
+
+The below code is to set up a router 
+
+
+App.js
+<BrowserRouter>
+  <Navbar/>
+  <Routes>
+    <Route 
+      exact path='/general'
+      element={<News key='general' pageSize={10} country={'in'} category={"general"}/>}
+    />
+    <Route 
+      exact path='/business'
+      element={<News key='business' pageSize={10} country={'in'} category={"business"}/>}
+    />
+    <Route 
+      exact path='/entertainment'
+      element={<News key='entertainment' pageSize={10} country={'in'} category={"entertainment"}/>}
+    />
+    <Route 
+      exact path='/health'
+      element={<News key='health' pageSize={10} country={'in'} category={"health"}/>}
+    />
+    <Route 
+      exact path='/science'
+      element={<News key='science' pageSize={10} country={'in'} category={"science"}/>}
+    />
+    <Route 
+      exact path='/sports'
+      element={<News key='sports' pageSize={10} country={'in'} category={"sports"}/>}
+    />
+    <Route 
+      exact path='/technology'
+      element={<News key='technology' pageSize={10} country={'in'} category={"technology"}/>}
+    />
+  </Routes>        
+</BrowserRouter>
+
+****
+If we did not have a key="" in each of the news component then the page would not reload and we would see the old content 
+This is because react already mounted the News component and even though the props are different, the component is the same, therefore it does not reload
+If we put the key react will mount the component every time after its sent with different props even though it might be the same component
+
+_____________________________________________________________________________________________________________________________________________________________
+
+"publishedAt": "2024-07-04T15:19:26Z"
+The time is given in this way.
+We can make it better by 
+let a = element.publishedAt
+let t = new Date(a)
+
+Now we can access the date and time info about this by using 
+t.getTime()
+t.getDate()
+That is a better way than slicing
+
+_____________________________________________________________________________________________________________________________________________________________
+https://www.youtube.com/watch?v=abjeWy4sZiU&list=PLu0W_9lII9agx66oZnT6IyhcMIbUMNMdt&index=34
+
+mounting of component and its lifecycle
+
+render()
+componentDidMount()
+componentDidUpdate()
+componentWillUnmount()
+
+Learn these important functions
